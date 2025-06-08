@@ -301,7 +301,7 @@ export async function POST(req: NextRequest) {
     
     const model = new ChatOpenAI({
       temperature: 0.7,
-      model: "gpt-4-turbo-preview", // Changed from invalid model name
+      model: "gpt-4o-2024-08-06",
     });
     
     const prompt = PromptTemplate.fromTemplate(TEMPLATE);
