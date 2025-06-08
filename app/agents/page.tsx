@@ -5,7 +5,7 @@ export default function AgentsPage() {
   const InfoCard = (
     <GuideInfoBox>
       <ul>
-        
+
       </ul>
     </GuideInfoBox>
   );
@@ -14,8 +14,8 @@ export default function AgentsPage() {
     <ChatWindow
       endpoint="api/chat/agents"
       emptyStateComponent={InfoCard}
-      placeholder="Squawk! I'm a conversational agent! Ask me about the current weather in Honolulu!"
-      emoji="🦜"
+      placeholder="I'm an AI agent that can help you build and design websites! Tell me about your business goals."
+      emoji="🤖"
       showIntermediateStepsToggle={true}
     />
   );

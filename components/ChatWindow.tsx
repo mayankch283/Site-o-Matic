@@ -31,22 +31,30 @@ function ChatMessages(props: {
   className?: string;
 }) {
   return (
-    <div className="flex flex-col max-w-[768px] mx-auto pb-12 w-full">
-      {props.messages.map((m, i) => {
-        if (m.role === "system") {
-          return <IntermediateStep key={m.id} message={m} />;
-        }
+    <div className="flex flex-col max-w-[768px] mx-auto w-full space-y-4">
+      {props.messages.length === 0 ? (
+        <div className="flex items-center justify-center min-h-[60vh]">
+          {props.emptyStateComponent}
+        </div>
+      ) : (
+        props.messages.map((m, i) => {
+          if (m.role === "system") {
+            return <IntermediateStep key={m.id} message={m} />;
+          }
 
-        const sourceKey = (props.messages.length - 1 - i).toString();
-        return (
-          <ChatMessageBubble
-            key={m.id}
-            message={m}
-            aiEmoji={props.aiEmoji}
-            sources={props.sourcesForMessages[sourceKey]}
-          />
-        );
-      })}
+          const sourceKey = (props.messages.length - 1 - i).toString();
+          return (
+            <ChatMessageBubble
+              key={m.id}
+              message={m}
+              aiEmoji={props.aiEmoji}
+              sources={props.sourcesForMessages[sourceKey]}
+            />
+          );
+        })
+      )}
+      {/* Add some bottom padding so the last message isn't too close to the input */}
+      <div className="h-4" />
     </div>
   );
 }
@@ -131,18 +139,23 @@ function StickyToBottomContent(props: {
 }) {
   const context = useStickToBottomContext();
 
-  // scrollRef will also switch between overflow: unset to overflow: auto
   return (
     <div
-      ref={context.scrollRef}
-      style={{ width: "100%", height: "100%" }}
-      className={cn("grid grid-rows-[1fr,auto]", props.className)}
+      className={cn("grid grid-rows-[1fr,auto] h-full", props.className)}
     >
-      <div ref={context.contentRef} className={props.contentClassName}>
-        {props.content}
+      <div 
+        ref={context.scrollRef}
+        className="overflow-y-auto overflow-x-hidden"
+        style={{ height: "100%" }}
+      >
+        <div ref={context.contentRef} className={props.contentClassName}>
+          {props.content}
+        </div>
       </div>
 
-      {props.footer}
+      <div className="flex-shrink-0">
+        {props.footer}
+      </div>
     </div>
   );
 }
@@ -152,11 +165,11 @@ export function ChatLayout(props: { content: ReactNode; footer: ReactNode }) {
     <StickToBottom>
       <StickyToBottomContent
         className="absolute inset-0"
-        contentClassName="py-8 px-2"
+        contentClassName="py-4 px-4 min-h-full"
         content={props.content}
         footer={
-          <div className="sticky bottom-8 px-2">
-            <ScrollToBottom className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4" />
+          <div className="p-4 bg-background border-t border-border/10">
+            <ScrollToBottom className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2" />
             {props.footer}
           </div>
         }
@@ -309,7 +322,7 @@ export function ChatWindow(props: {
           onChange={chat.handleInputChange}
           onSubmit={sendMessage}
           loading={chat.isLoading || intermediateStepsLoading}
-          placeholder={props.placeholder ?? "What's it like to be a pirate?"}
+          placeholder={props.placeholder ?? "Tell me about your business and I'll help you build a website!"}
         >
           {props.showIngestForm && (
             <Dialog>

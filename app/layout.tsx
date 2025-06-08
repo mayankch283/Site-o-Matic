@@ -1,4 +1,5 @@
 import "./globals.css";
+import "highlight.js/styles/github.css";
 import { Public_Sans } from "next/font/google";
 import { ActiveLink } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
