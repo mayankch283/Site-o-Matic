@@ -160,7 +160,13 @@ if (require.main === module) {
       // Try to load generated.json if it exists
       let configObject;
       try {
-        configObject = require('./generated.json');
+        // Check if the file exists before requiring it
+        if (fs.existsSync('./generated.json')) {
+          configObject = require('./generated.json');
+        } else {
+          console.error('No generated.json found. Please generate a configuration first.');
+          process.exit(1);
+        }
       } catch (e) {
         console.error('No generated.json found. Please generate a configuration first.');
         process.exit(1);
