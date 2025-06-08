@@ -10,7 +10,7 @@ import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 import { ChatMessageBubble } from "@/components/ChatMessageBubble";
 import { IntermediateStep } from "./IntermediateStep";
 import { Button } from "./ui/button";
-import { ArrowDown, LoaderCircle, Paperclip } from "lucide-react";
+import { ArrowDown, LoaderCircle, Paperclip, Settings } from "lucide-react";
 import { Checkbox } from "./ui/checkbox";
 import { UploadDocumentsForm } from "./UploadDocumentsForm";
 import {
@@ -22,6 +22,8 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { cn } from "@/utils/cn";
+import { useConfigDetection, useAutoSiteUpdate } from "@/hooks/useConfigDetection";
+import { SiteUpdaterPanel } from "@/components/ConfigDeploymentCard";
 
 function ChatMessages(props: {
   messages: Message[];
@@ -143,7 +145,7 @@ function StickyToBottomContent(props: {
     <div
       className={cn("grid grid-rows-[1fr,auto] h-full", props.className)}
     >
-      <div 
+      <div
         ref={context.scrollRef}
         className="overflow-y-auto overflow-x-hidden"
         style={{ height: "100%" }}
@@ -185,17 +187,18 @@ export function ChatWindow(props: {
   emoji?: string;
   showIngestForm?: boolean;
   showIntermediateStepsToggle?: boolean;
+  enableSiteDeployment?: boolean;
 }) {
   const [showIntermediateSteps, setShowIntermediateSteps] = useState(
     !!props.showIntermediateStepsToggle,
   );
   const [intermediateStepsLoading, setIntermediateStepsLoading] =
     useState(false);
+  const [autoDeployEnabled, setAutoDeployEnabled] = useState(false);
 
   const [sourcesForMessages, setSourcesForMessages] = useState<
     Record<string, any>
   >({});
-
   const chat = useChat({
     api: props.endpoint,
     onResponse(response) {
@@ -218,6 +221,10 @@ export function ChatWindow(props: {
         description: e.message,
       }),
   });
+
+  // Configuration detection hooks (after chat is declared)
+  const { detectedConfigs, latestConfig, hasConfigs } = useConfigDetection(chat.messages);
+  const { isAutoUpdating } = useAutoSiteUpdate(latestConfig, autoDeployEnabled);
 
   async function sendMessage(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -301,27 +308,41 @@ export function ChatWindow(props: {
       },
     ]);
   }
-
   return (
     <ChatLayout
       content={
-        chat.messages.length === 0 ? (
-          <div>{props.emptyStateComponent}</div>
-        ) : (
-          <ChatMessages
-            aiEmoji={props.emoji}
-            messages={chat.messages}
-            emptyStateComponent={props.emptyStateComponent}
-            sourcesForMessages={sourcesForMessages}
-          />
-        )
+        <div className="space-y-6">
+          {chat.messages.length === 0 ? (
+            <div>{props.emptyStateComponent}</div>
+          ) : (
+            <>
+              <ChatMessages
+                aiEmoji={props.emoji}
+                messages={chat.messages}
+                emptyStateComponent={props.emptyStateComponent}
+                sourcesForMessages={sourcesForMessages}
+              />
+
+              {/* Site Deployment Panel */}
+              {(props.enableSiteDeployment !== false) && hasConfigs && (
+                <div className="max-w-[768px] mx-auto w-full">
+                  <SiteUpdaterPanel
+                    detectedConfigs={detectedConfigs}
+                    autoDeployEnabled={autoDeployEnabled}
+                    onToggleAutoDeploy={setAutoDeployEnabled}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
       }
       footer={
         <ChatInput
           value={chat.input}
           onChange={chat.handleInputChange}
           onSubmit={sendMessage}
-          loading={chat.isLoading || intermediateStepsLoading}
+          loading={chat.isLoading || intermediateStepsLoading || isAutoUpdating}
           placeholder={props.placeholder ?? "Tell me about your business and I'll help you build a website!"}
         >
           {props.showIngestForm && (
@@ -359,6 +380,22 @@ export function ChatWindow(props: {
               />
               <label htmlFor="show_intermediate_steps" className="text-sm">
                 Show intermediate steps
+              </label>
+            </div>
+          )}
+
+          {/* Auto-deployment toggle */}
+          {(props.enableSiteDeployment !== false) && hasConfigs && (
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="auto_deploy"
+                name="auto_deploy"
+                checked={autoDeployEnabled}
+                disabled={chat.isLoading || intermediateStepsLoading || isAutoUpdating}
+                onCheckedChange={(e) => setAutoDeployEnabled(!!e)}
+              />
+              <label htmlFor="auto_deploy" className="text-sm">
+                Auto-deploy sites
               </label>
             </div>
           )}
