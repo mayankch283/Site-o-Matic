@@ -167,7 +167,35 @@ const siteConfig: SiteConfig = {{
     "enableProductZoom": true,
     "enableQuickAdd": false
   }},
-  "products": [],  
+  "products": [
+    {{
+      id: "1",
+      name: "Classic Snapback Cap",
+      price: 29.99,
+      image: "/assets/cap-1.jpg",
+      images: ["/assets/cap-1.jpg", "/assets/cap-1-2.jpg", "/assets/cap-1-3.jpg"],
+      slug: "classic-snapback-cap",
+      description: "Timeless style meets comfort in this classic snapback design. Made with premium materials and featuring an adjustable snapback closure for the perfect fit.",
+      category: "snapbacks",
+      features: ["100% Cotton", "Adjustable Snapback", "Structured Crown", "Flat Brim"],
+      sizes: ["One Size"],
+      colors: ["Black", "Navy", "Gray", "White"],
+      inStock: true,
+    }},
+    {{
+      id: "2",
+      name: "Premium Leather Cap",
+      price: 59.99,
+      image: "/assets/cap-2.jpg",
+      images: ["/assets/cap-2.jpg", "/assets/cap-2-2.jpg"],
+      slug: "premium-leather-cap",
+      description: "Luxurious leather construction for the discerning cap enthusiast. This premium piece combines style and durability.",
+      category: "premium",
+      features: ["Genuine Leather", "Adjustable Strap", "Premium Lining", "Water Resistant"],
+      sizes: ["S/M", "L/XL"],
+      colors: ["Brown", "Black"],
+      inStock: true,
+    }},  
   "content": {{
     "about": {{
       "title": "About ElectroHub",
