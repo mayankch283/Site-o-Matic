@@ -51,6 +51,9 @@ export default function RootLayout({
                     Structured Output
                   </ActiveLink>
                   <ActiveLink href="/agents">Agents</ActiveLink>
+                  <ActiveLink href="/image-generator">
+                    Image Generator
+                  </ActiveLink>
                 </nav>
               </div>
             </div>
